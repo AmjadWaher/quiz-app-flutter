@@ -78,3 +78,74 @@ Smart Quiz is built following a **Clean Architecture** approach, organized into 
 
 ## 🗂️ Folder Structure
 
+<img width="479" height="680" alt="image" src="https://github.com/user-attachments/assets/911351ae-96b4-4fbc-bfc3-eb4f20ea24c5" />
+
+
+---
+
+## ⚙️ Technical Details
+
+### 🔹 State Management
+- Managed using **flutter_bloc** and **Cubit**.
+- Each feature has its own Bloc for scalability.
+- Example:  
+  - `AuthBloc` → handles login/register/reset password.  
+  - `QuizUserBloc` → handles quiz retrieval and submission.  
+  - `TimerBloc` → uses a custom `Ticker` stream for countdown timers.
+
+### 🔹 Networking
+- Uses **Dio** for HTTP requests.
+- Centralized API endpoints and error models.
+- `Failure` and `ErrorMessageModel` used for safe error handling.
+- Returns `Either<Failure, T>` from repositories using **Dartz**.
+
+### 🔹 Dependency Injection
+- Implemented with **GetIt** (`service_locator.dart`).
+- Registers:
+  - Data sources
+  - Repositories
+  - Use cases
+  - Blocs
+
+### 🔹 Local Storage & Security
+- **flutter_secure_storage** → stores sensitive data (JWT tokens).
+- **shared_preferences** → stores small local settings.
+- **jwt_decoder** → decodes and validates tokens.
+
+### 🔹 Deep Linking
+- Managed with `AppLinksManager` to handle in-app routing from external links.
+
+### 🔹 Theming & UI
+- Unified design with **AppTheme** using `Material` + `GoogleFonts`.
+- Reusable widgets for cards, quiz elements, forms, and buttons.
+
+---
+
+## 🧩 Main Features by Role
+
+### 👩‍🏫 Admin (Teacher)
+- Add, edit, delete, and view:
+  - Categories
+  - Quizzes
+  - Questions
+- View statistics dashboard.
+- Search quizzes and manage quiz data.
+
+### 👨‍🎓 User (Student)
+- Browse quiz categories.
+- Search for quizzes by keyword.
+- Take quizzes with timers.
+- See quiz results instantly.
+- Retry or view correct answers.
+
+---
+
+## 🧠 BLoC Flow (Authentication)
+1. User enters credentials and clicks “Login”.
+2. `LoginEvent` dispatched to `AuthBloc`.
+3. `AuthBloc` calls `LoginUseCase`.
+4. `LoginUseCase` interacts with `AuthRepository`.
+5. `AuthRepository` calls `AuthRemoteDataSource` (via Dio).
+6. API response parsed → success or failure returned.
+7. `AuthBloc` emits `Authenticated` or `AuthError` state.
+8. `AuthGate` routes the user accordingly.
